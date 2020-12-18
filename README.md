@@ -7,7 +7,7 @@
 ## 프로젝트 설정
 
 ### IMSDK 추가
-- ``` IMSDK.aar ``` 파일을 프로젝트 내 ``` app/libs/ ``` 안에 넣어줍니다.
+- ``` imsdk.aar ``` 파일을 프로젝트 내 ``` app/libs/ ``` 안에 넣어줍니다.
 
 ### AndroidManifest
 - 필수 권한을 추가합니다
@@ -51,15 +51,6 @@ dependencies {
   // Kotlin
   implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 
-  // OkHttp3
-  implementation 'com.squareup.okhttp3:okhttp:4.0.1'
-  implementation 'com.squareup.okhttp3:logging-interceptor:4.0.1'
-  implementation 'com.squareup.okhttp3:okhttp-urlconnection:4.0.1'
-  // Retrofit2
-  implementation 'com.squareup.retrofit2:retrofit:2.6.1'
-  implementation 'com.squareup.retrofit2:converter-gson:2.6.1'
-  implementation 'com.squareup.retrofit2:adapter-rxjava2:2.6.1'
-  
   // Gson
   implementation 'com.google.code.gson:gson:2.8.5'
   
