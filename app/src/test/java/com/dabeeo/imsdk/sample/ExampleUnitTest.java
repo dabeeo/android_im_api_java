@@ -1,4 +1,4 @@
-package com.dabeeo.imapi;
+package com.dabeeo.imsdk.sample;
 
 import org.junit.Test;
 
