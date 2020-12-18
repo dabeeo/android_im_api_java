@@ -9,6 +9,9 @@
 ### IMSDK 추가
 - ``` imsdk.aar ``` 파일을 프로젝트 내 ``` app/libs/ ``` 안에 넣어줍니다.
 
+### MAPDATA FILE 추가
+- ``` mapdata.json ``` 파일을 프로젝트 내 ``` app/src/main/assets/ ``` 안에 넣어줍니다.
+
 ### AndroidManifest
 - 필수 권한을 추가합니다
 

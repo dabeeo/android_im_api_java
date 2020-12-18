@@ -114,7 +114,7 @@ public class MainFragment extends Fragment {
 
             try {
                 StringBuilder sb = new StringBuilder();
-                InputStream is = getResources().getAssets().open("test.json");
+                InputStream is = getResources().getAssets().open("mapdata.json");
                 BufferedReader br = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
                 String str;
                 while ((str = br.readLine()) != null) {
