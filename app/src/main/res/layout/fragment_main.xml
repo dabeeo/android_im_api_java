@@ -6,112 +6,87 @@
     android:layout_height="match_parent"
     tools:context=".view.main.MainFragment">
 
-    <LinearLayout
-        android:id="@+id/layoutMapContainer"
-        android:layout_width="0dp"
-        android:layout_height="380dp"
-        android:orientation="vertical"
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
-        <RelativeLayout
-            android:id="@+id/layoutHandle"
-            android:layout_width="match_parent"
-            android:layout_height="24dp"
-            android:background="@color/black"
-            tools:visibility="visible">
-
-            <ImageView
-                android:id="@+id/imgHandle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:src="@drawable/shape_map_handle" />
-
-        </RelativeLayout>
-
-        <RelativeLayout
+        <com.dabeeo.imsdk.map.MapView
+            android:id="@+id/mapView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent">
+            app:frameRate="60.0"
+            app:renderMode="RENDER_WHEN_DIRTY" />
 
-            <com.dabeeo.imsdk.map.MapView
-                android:id="@+id/mapView"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerFloors"
+            android:layout_width="46dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:background="@drawable/shape_map_btn_back"
+            android:elevation="5dp"
+            tools:listitem="@layout/list_item_floor" />
+
+        <LinearLayout
+            android:layout_width="46dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_margin="16dp"
+            android:background="@drawable/shape_map_btn_back"
+            android:elevation="5dp"
+            android:orientation="vertical">
+
+            <androidx.appcompat.widget.AppCompatImageButton
+                android:id="@+id/btnZoomIn"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                app:frameRate="60.0"
-                app:renderMode="RENDER_WHEN_DIRTY" />
+                android:layout_height="46dp"
+                android:background="@null"
+                android:src="@drawable/ic_btn_zoom_in" />
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerFloors"
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/liver" />
+
+            <ImageButton
+                android:id="@+id/btnZoomOut"
+                android:layout_width="match_parent"
+                android:layout_height="46dp"
+                android:background="@null"
+                android:src="@drawable/ic_btn_zoom_out" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="20dp"
+            android:orientation="vertical">
+
+            <ImageButton
+                android:id="@+id/btnSearch"
                 android:layout_width="46dp"
-                android:layout_height="wrap_content"
-                android:layout_margin="16dp"
+                android:layout_height="46dp"
                 android:background="@drawable/shape_map_btn_back"
-                android:elevation="5dp"
-                tools:listitem="@layout/list_item_floor" />
+                android:src="@drawable/ic_icon_search1" />
 
-            <LinearLayout
-                android:layout_width="46dp"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_margin="16dp"
-                android:background="@drawable/shape_map_btn_back"
-                android:elevation="5dp"
-                android:orientation="vertical">
+        </LinearLayout>
 
-                <androidx.appcompat.widget.AppCompatImageButton
-                    android:id="@+id/btnZoomIn"
-                    android:layout_width="match_parent"
-                    android:layout_height="46dp"
-                    android:background="@null"
-                    android:src="@drawable/ic_btn_zoom_in" />
+    </RelativeLayout>
 
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="@color/liver" />
-
-                <ImageButton
-                    android:id="@+id/btnZoomOut"
-                    android:layout_width="match_parent"
-                    android:layout_height="46dp"
-                    android:background="@null"
-                    android:src="@drawable/ic_btn_zoom_out" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_alignParentBottom="true"
-                android:layout_marginEnd="16dp"
-                android:layout_marginBottom="20dp"
-                android:orientation="vertical">
-
-                <ImageButton
-                    android:id="@+id/btnSearch"
-                    android:layout_width="46dp"
-                    android:layout_height="46dp"
-                    android:background="@drawable/shape_map_btn_back"
-                    android:src="@drawable/ic_icon_search1" />
-
-            </LinearLayout>
-
-        </RelativeLayout>
-
-    </LinearLayout>
 
     <com.dabeeo.imsdk.sample.view.layout.LocationSettingView
         android:id="@+id/layoutLocationSetting"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:visibility="gone"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:visibility="visible" />
 
@@ -120,18 +95,18 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:visibility="gone"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        tools:visibility="visible"/>
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:visibility="visible" />
 
     <com.dabeeo.imsdk.sample.view.layout.NavigationInfoView
         android:id="@+id/layoutNavigationInfo"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:visibility="gone"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        tools:visibility="visible"/>
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:visibility="visible" />
 </androidx.constraintlayout.widget.ConstraintLayout>

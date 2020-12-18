@@ -71,7 +71,6 @@ public class MainFragment extends Fragment {
     private LocationSettingView layoutLocationSetting;
     private NavigationInfoView layoutNavigationInfo;
 
-    private MapViewHandle mapViewHandle;
     private List<FloorInfo> floorInfoList;
 
     private LocationInfo startLocation;
@@ -111,13 +110,11 @@ public class MainFragment extends Fragment {
         floorListView.addItemDecoration(divider);
 
         // map handle
-        LinearLayout container = rootView.findViewById(R.id.layoutMapContainer);
-        mapViewHandle = new MapViewHandle(getContext(), rootView.findViewById(R.id.layoutHandle), container);
         mapView.postDelayed(() -> {
 
             try {
                 StringBuilder sb = new StringBuilder();
-                InputStream is = getResources().getAssets().open("reeum_m1.json");
+                InputStream is = getResources().getAssets().open("test.json");
                 BufferedReader br = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
                 String str;
                 while ((str = br.readLine()) != null) {
@@ -130,7 +127,7 @@ public class MainFragment extends Fragment {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }, 1000);
+        }, 100);
 
         // zoom buttons
         rootView.findViewById(R.id.btnZoomIn)
