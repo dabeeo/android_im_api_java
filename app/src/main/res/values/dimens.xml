@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="btn_elevation">8dp</dimen>
+    <dimen name="btn_corner">4dp</dimen>
+    <dimen name="mapview_handle_height">18dp</dimen>
+    <dimen name="mapview_handle_info_height">36dp</dimen>
+    <dimen name="mapview_height">350dp</dimen>
+    <dimen name="mapview_layout_height">368dp</dimen>
+</resources>
