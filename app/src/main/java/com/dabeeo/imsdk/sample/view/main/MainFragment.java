@@ -109,25 +109,8 @@ public class MainFragment extends Fragment {
         divider.setDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.shape_divider));
         floorListView.addItemDecoration(divider);
 
-        // map handle
-        mapView.postDelayed(() -> {
 
-            try {
-                StringBuilder sb = new StringBuilder();
-                InputStream is = getResources().getAssets().open("mapdata.json");
-                BufferedReader br = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
-                String str;
-                while ((str = br.readLine()) != null) {
-                    sb.append(str);
-                }
-                br.close();
-
-                mapView.syncMapDataByJson(sb.toString(), mapCallback);
-
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }, 100);
+        mapView.syncMapDataByJson("reeum_m1.json", mapCallback);
 
         // zoom buttons
         rootView.findViewById(R.id.btnZoomIn)

@@ -3,6 +3,7 @@
 본 저장소는 IMSDK를 보다 쉽게 적용하기 위한 튜토리얼 프로젝트를 제공합니다.
 
 ## API 문서
+- [API 문서로 이동](https://docs.google.com/document/d/1xoOEj1Cjr3eBWwXsoTtHBMRSzQoz5-dYL15Je1l7VMY/edit?usp=sharing)
 
 ## 프로젝트 설정
 
@@ -74,3 +75,5 @@ compileOptions {
   targetCompatibility JavaVersion.VERSION_1_8
 }
 ```
+
+## 샘플 코드 (Java)
