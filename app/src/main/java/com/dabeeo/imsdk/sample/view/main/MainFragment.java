@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -33,13 +32,11 @@ import com.dabeeo.imsdk.navigation.data.Route;
 
 import com.dabeeo.imsdk.sample.R;
 import com.dabeeo.imsdk.sample.data.LocationInfo;
-import com.dabeeo.imsdk.sample.view.handle.MapViewHandle;
 import com.dabeeo.imsdk.sample.view.layout.LocationInfoView;
 import com.dabeeo.imsdk.sample.view.layout.LocationSettingView;
 import com.dabeeo.imsdk.sample.view.layout.NavigationInfoView;
 import com.dabeeo.imsdk.sample.view.main.adapter.FloorListAdapter;
 
-import org.jetbrains.annotations.NotNull;
 import org.rajawali3d.math.vector.Vector3;
 
 import java.io.BufferedReader;
@@ -218,7 +215,7 @@ public class MainFragment extends Fragment {
 
     private final MapCallback mapCallback = new MapCallback() {
         @Override
-        public void onSuccess(@NotNull List<FloorInfo> list) {
+        public void onSuccess(List<FloorInfo> list) {
             FloorListAdapter adapter = new FloorListAdapter();
             adapter.setItems(list);
             adapter.setCallback(item -> mapView.setFloor(item.getLevel()));
@@ -230,7 +227,7 @@ public class MainFragment extends Fragment {
         }
 
         @Override
-        public void onError(@NotNull Exception e) {
+        public void onError( Exception e) {
 
         }
 
@@ -241,7 +238,7 @@ public class MainFragment extends Fragment {
         }
 
         @Override
-        public void onClick(double x, double y, @org.jetbrains.annotations.Nullable Poi poi) {
+        public void onClick(double x, double y, Poi poi) {
             mapView.removeMarker();
             mapView.addMarker(R.drawable.pin, x, y, currentFloor);
             mapView.drawMarker();
@@ -271,7 +268,7 @@ public class MainFragment extends Fragment {
         }
 
         @Override
-        public void onLongClick(double x, double y, @org.jetbrains.annotations.Nullable Poi poi) {
+        public void onLongClick(double x, double y, Poi poi) {
             mapView.removeMarker();
             mapView.addMarker(R.drawable.pin, x, y, currentFloor);
             mapView.drawMarker();
@@ -303,7 +300,7 @@ public class MainFragment extends Fragment {
 
     private final NavigationListener navigationListener = new NavigationListener() {
         @Override
-        public void onPathResult(@NotNull PathResult pathResult) {
+        public void onPathResult( PathResult pathResult) {
             if (pathResult.isSuccess()) {
                 layoutNavigationInfo.bind(pathResult.getPathData());
             }
@@ -325,7 +322,7 @@ public class MainFragment extends Fragment {
         }
 
         @Override
-        public void onUpdate(@NotNull Route route, @NotNull Path path, @NotNull NodeData nodeData, @NotNull Vector3 vector3) {
+        public void onUpdate( Route route,  Path path,  NodeData nodeData,  Vector3 vector3) {
 
         }
 
@@ -335,14 +332,14 @@ public class MainFragment extends Fragment {
         }
 
         @Override
-        public void onError(@org.jetbrains.annotations.Nullable IMError error) {
+        public void onError(IMError error) {
             Toast.makeText(requireContext(), error.getMessage(), Toast.LENGTH_SHORT).show();
         }
     };
 
     private final LocationCallback locationCallback = new LocationCallback() {
         @Override
-        public void onError(@NotNull Exception e) {
+        public void onError( Exception e) {
 
         }
 
@@ -362,7 +359,7 @@ public class MainFragment extends Fragment {
         }
 
         @Override
-        public void onLocationStatus(@NotNull LocationStatus locationStatus) {
+        public void onLocationStatus( LocationStatus locationStatus) {
 
         }
     };
