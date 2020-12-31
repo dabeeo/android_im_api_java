@@ -10,8 +10,8 @@ android {
         applicationId "com.dabeeo.imsdk.sample"
         minSdkVersion 24
         targetSdkVersion 30
-        versionCode 10000
-        versionName "1.00.00"
+        versionCode 100001
+        versionName "1.00.01"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -47,5 +47,5 @@ dependencies {
     implementation 'io.reactivex.rxjava2:rxjava:2.2.11'
     implementation 'io.reactivex.rxjava2:rxkotlin:2.4.0'
 
-    implementation 'com.dabeeo.imsdk:imsdk:1.00.00@aar'
+    implementation 'com.dabeeo.imsdk:imsdk-v1.00.00-release:1.00.00@aar'
 }
