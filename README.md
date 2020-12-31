@@ -64,7 +64,7 @@ dependencies {
   implementation 'io.reactivex.rxjava2:rxkotlin:2.4.0'
 
   // IMSDK
-  implementation 'com.dabeeo.imsdk:imsdk:1.00.00@aar'
+  implementation 'com.dabeeo.imsdk:imsdk-v1.00.00-release:1.00.00@aar'
 }
 ```
 - 자바 8 이상을 사용하도록 설정합니다.
@@ -311,5 +311,55 @@ mapView.cancelNavigationPreview();
 mapView.startNavigation();
 // 내비게이션을 종료합니다.
 mapView.cancelNavigation();
+```
+</details>
+
+<details>
+<summary>UWB 측위</summary>
+    
+### UWB로부터 측위데이터를 받아 지도에 표시하는 방법을 설명합니다.
+    
+> 위치 초기화
+    
+```java
+// 위치 데이터를 초기화합니다.
+private final LocationCallback locationCallback = new LocationCallback() {
+        @Override
+        public void onError(Exception e) {
+
+        }
+
+        @Override
+        public void onChangeFloor(int floor) {
+
+        }
+
+        @Override
+        public void initLocation(double x, double y, double angle, int floor) {
+
+        }
+
+        @Override
+        public void onLocation(double x, double y, double angle, int floor) {
+
+        }
+
+        @Override
+        public void onLocationStatus(LocationStatus locationStatus) {
+
+        }
+    };
+
+LocationSourceUwb locationSourceUwb = new LocationSourceUwb();
+mapView.initPosition(locationSourceUwb, locationCallback);
+
+
+> 위치 트래
+
+```java
+// 위치 트래킹을 시작합니다.
+if (locationSourceUwb != null) {
+    locationSourceUwb.pushLocationData(x, y, 0.0, currentFloor);
+}
 ```
 </details>
