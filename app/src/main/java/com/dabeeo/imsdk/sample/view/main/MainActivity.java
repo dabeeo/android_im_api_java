@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
 
         getSupportFragmentManager()
                 .beginTransaction()
-                .replace(R.id.content, MainFragment.newInstance())
+                .replace(R.id.content, UWBFragment.newInstance())
                 .commitNow();
 
     }
