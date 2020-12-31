@@ -354,7 +354,7 @@ LocationSourceUwb locationSourceUwb = new LocationSourceUwb();
 mapView.initPosition(locationSourceUwb, locationCallback);
 
 
-> 위치 트래
+> 위치 트래킹
 
 ```java
 // 위치 트래킹을 시작합니다.
