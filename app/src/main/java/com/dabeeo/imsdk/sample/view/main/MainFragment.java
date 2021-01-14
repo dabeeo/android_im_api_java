@@ -235,9 +235,9 @@ public class MainFragment extends Fragment {
 
         @Override
         public void onClick(double x, double y, Poi poi) {
-            mapView.removeMarker();
-            mapView.addMarker(R.drawable.pin, x, y, currentFloor);
-            mapView.drawMarker();
+//            mapView.removeMarker();
+//            mapView.addMarker(R.drawable.pin, x, y, currentFloor);
+//            mapView.drawMarker();
 
             String name;
             if (poi != null) {
@@ -265,9 +265,9 @@ public class MainFragment extends Fragment {
 
         @Override
         public void onLongClick(double x, double y, Poi poi) {
-            mapView.removeMarker();
-            mapView.addMarker(R.drawable.pin, x, y, currentFloor);
-            mapView.drawMarker();
+//            mapView.removeMarker();
+//            mapView.addMarker(R.drawable.pin, x, y, currentFloor);
+//            mapView.drawMarker();
 
             String name;
             if (poi != null) {
