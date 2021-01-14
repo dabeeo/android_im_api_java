@@ -166,6 +166,9 @@ public class UWBFragment extends Fragment {
             if (locationSourceUwb != null) {
                 locationSourceUwb.pushLocationData(x, y, 0.0, currentFloor);
             }
+
+            fixRotationMap(!mapView.enableRotation());
+//            fixScaleMap(!mapView.enableScale());
             drawMarker(x, y);
         }
     };
@@ -214,5 +217,13 @@ public class UWBFragment extends Fragment {
         markerManagerWrapper.createMarker(R.drawable.icon_arrive, x, (y + locationDiff * 2), 50, 50, currentFloor);
         markerManagerWrapper.createMarker(R.drawable.icon_arrive, x, (y + locationDiff * 2), 50, 50, currentFloor + 1);
         markerManagerWrapper.drawMarkers();
+    }
+
+    private void fixRotationMap(boolean enable) {
+        mapView.enableRotation(enable);
+    }
+
+    private void fixScaleMap(boolean enable) {
+        mapView.enableScale(enable);
     }
 }
