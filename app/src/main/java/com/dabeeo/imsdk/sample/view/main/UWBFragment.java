@@ -167,9 +167,9 @@ public class UWBFragment extends Fragment {
                 locationSourceUwb.pushLocationData(x, y, 0.0, currentFloor);
             }
 
-            fixRotationMap(!mapView.enableRotation());
+//            fixRotationMap(!mapView.enableRotation());
 //            fixScaleMap(!mapView.enableScale());
-            drawMarker(x, y);
+//            drawMarker(x, y);
         }
     };
 
