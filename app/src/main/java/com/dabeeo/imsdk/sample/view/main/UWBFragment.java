@@ -26,7 +26,9 @@ import com.dabeeo.imsdk.map.MapView;
 import com.dabeeo.imsdk.model.common.FloorInfo;
 import com.dabeeo.imsdk.model.map.Poi;
 import com.dabeeo.imsdk.sample.R;
+import com.dabeeo.imsdk.sample.view.layout.MarkerTestView;
 import com.dabeeo.imsdk.sample.view.main.adapter.FloorListAdapter;
+import com.dabeeo.imsdk.sample.view.main.manager.MarkerManagerWrapper;
 
 
 import java.io.BufferedReader;
@@ -57,6 +59,7 @@ public class UWBFragment extends Fragment {
     private List<FloorInfo> floorInfoList;
 
     private LocationSourceUwb locationSourceUwb;
+    private MarkerManagerWrapper markerManagerWrapper;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -72,6 +75,7 @@ public class UWBFragment extends Fragment {
 
         mapView = rootView.findViewById(R.id.mapView);
         floorListView = rootView.findViewById(R.id.recyclerFloors);
+        markerManagerWrapper = MarkerManagerWrapper.getInstance(mapView);
 
         return rootView;
     }
@@ -162,6 +166,10 @@ public class UWBFragment extends Fragment {
             if (locationSourceUwb != null) {
                 locationSourceUwb.pushLocationData(x, y, 0.0, currentFloor);
             }
+
+//            fixRotationMap(!mapView.enableRotation());
+//            fixScaleMap(!mapView.enableScale());
+//            drawMarker(x, y);
         }
     };
 
@@ -192,4 +200,30 @@ public class UWBFragment extends Fragment {
 
         }
     };
+
+    private void drawMarker(double x, double y) {
+        markerManagerWrapper.clearMarkers();
+        int locationDiff = 80;
+
+        final View inflateView = markerManagerWrapper.getInflateView(getActivity());
+        final View javaCodeView = markerManagerWrapper.getJavaCodeView(getActivity());
+        final MarkerTestView customView = markerManagerWrapper.getCustomView(getActivity());
+        customView.setResource(R.drawable.icon_start);
+        customView.setTitle("TITLE");
+
+        markerManagerWrapper.createMarker(inflateView, x - (locationDiff * 2), y, currentFloor).setRotateAngle(90);
+        markerManagerWrapper.createMarker(javaCodeView, x, y, currentFloor);
+        markerManagerWrapper.createMarker(customView, x + (locationDiff * 2), y, currentFloor).setRotateAngle(270);
+        markerManagerWrapper.createMarker(R.drawable.icon_arrive, x, (y + locationDiff * 2), 50, 50, currentFloor);
+        markerManagerWrapper.createMarker(R.drawable.icon_arrive, x, (y + locationDiff * 2), 50, 50, currentFloor + 1);
+        markerManagerWrapper.drawMarkers();
+    }
+
+    private void fixRotationMap(boolean enable) {
+        mapView.enableRotation(enable);
+    }
+
+    private void fixScaleMap(boolean enable) {
+        mapView.enableScale(enable);
+    }
 }

@@ -10,8 +10,8 @@ android {
         applicationId "com.dabeeo.imsdk.sample"
         minSdkVersion 24
         targetSdkVersion 30
-        versionCode 100001
-        versionName "1.00.01"
+        versionCode 100002
+        versionName "1.00.02"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -30,6 +30,7 @@ android {
 
 
 dependencies {
+    implementation fileTree(dir: 'libs', includes: ['*.jar'])
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'com.google.android.material:material:1.2.1'
@@ -47,5 +48,6 @@ dependencies {
     implementation 'io.reactivex.rxjava2:rxjava:2.2.11'
     implementation 'io.reactivex.rxjava2:rxkotlin:2.4.0'
 
-    implementation 'com.dabeeo.imsdk:imsdk-v1.00.00-release:1.00.00@aar'
+    implementation name: 'imsdk-v1.00.01-release', ext: 'aar'
+
 }
