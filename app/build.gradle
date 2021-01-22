@@ -10,8 +10,8 @@ android {
         applicationId "com.dabeeo.imsdk.sample"
         minSdkVersion 24
         targetSdkVersion 30
-        versionCode 100002
-        versionName "1.00.02"
+        versionCode 100003
+        versionName "1.00.03"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
