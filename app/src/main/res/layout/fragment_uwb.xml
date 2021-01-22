@@ -79,4 +79,127 @@
 
     </RelativeLayout>
 
+    <LinearLayout
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginStart="80dp"
+        android:layout_marginTop="15dp"
+        android:layout_marginEnd="80dp"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:padding="10dp"
+            android:background="#88000000"
+            android:id="@+id/infoLayout"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:gravity="center"
+                android:id="@+id/locationTextView"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:textColor="@color/white"
+                android:padding="3dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+            </TextView>
+
+            <TextView
+                android:gravity="center"
+                android:id="@+id/rotationTextView"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:textColor="@color/white"
+                android:padding="3dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+            </TextView>
+
+            <TextView
+                android:gravity="center"
+                android:id="@+id/zoomLevelTextView"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:textColor="@color/white"
+                android:padding="3dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+            </TextView>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/rotateLayout"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <Button
+                android:id="@+id/minusRotate"
+                android:layout_weight="1"
+                android:text="L ANGLE"
+                android:layout_width="1dp"
+                android:layout_height="wrap_content">
+            </Button>
+
+            <Button
+                android:id="@+id/addRotate"
+                android:layout_weight="1"
+                android:text="ANGLE R"
+                android:layout_width="1dp"
+                android:layout_height="wrap_content">
+            </Button>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/zoomLayout"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <Button
+                android:id="@+id/zoomOut"
+                android:layout_weight="1"
+                android:text="ZoomOut"
+                android:layout_width="1dp"
+                android:layout_height="wrap_content">
+            </Button>
+
+            <Button
+                android:id="@+id/zoomIn"
+                android:layout_weight="1"
+                android:text="ZoomIn"
+                android:layout_width="1dp"
+                android:layout_height="wrap_content">
+            </Button>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <Button
+                android:id="@+id/rotateActive"
+                android:layout_weight="1"
+                android:layout_width="1dp"
+                android:layout_height="wrap_content">
+            </Button>
+
+            <Button
+                android:id="@+id/zoomActive"
+                android:layout_weight="1"
+                android:layout_width="1dp"
+                android:layout_height="wrap_content">
+            </Button>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>
