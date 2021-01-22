@@ -5,7 +5,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
+import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -16,34 +17,33 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.dabeeo.imsdk.common.error.IMError;
 import com.dabeeo.imsdk.imenum.LocationStatus;
-import com.dabeeo.imsdk.imenum.TransType;
 import com.dabeeo.imsdk.location.LocationCallback;
 import com.dabeeo.imsdk.location.LocationSourceUwb;
 import com.dabeeo.imsdk.map.MapCallback;
 import com.dabeeo.imsdk.map.MapView;
+import com.dabeeo.imsdk.map.interfaces.IMMoveListener;
 import com.dabeeo.imsdk.model.common.FloorInfo;
+import com.dabeeo.imsdk.model.gl.Marker;
 import com.dabeeo.imsdk.model.map.Poi;
 import com.dabeeo.imsdk.sample.R;
 import com.dabeeo.imsdk.sample.view.layout.MarkerTestView;
 import com.dabeeo.imsdk.sample.view.main.adapter.FloorListAdapter;
 import com.dabeeo.imsdk.sample.view.main.manager.MarkerManagerWrapper;
 
-
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class UWBFragment extends Fragment {
+public class UWBFragment extends Fragment implements View.OnClickListener, IMMoveListener {
 
     public static final String TAG = UWBFragment.class.getSimpleName();
 
     private View rootView;
+    private Marker marker;
 
     public UWBFragment() {
         // Required empty public constructor
@@ -59,7 +59,21 @@ public class UWBFragment extends Fragment {
     private List<FloorInfo> floorInfoList;
 
     private LocationSourceUwb locationSourceUwb;
+    private double x = 100.0;
+
     private MarkerManagerWrapper markerManagerWrapper;
+
+    private Button addRotate;
+    private Button minusRotate;
+    private Button zoomIn;
+    private Button zoomOut;
+
+    private TextView locationTextView;
+    private TextView rotationTextView;
+    private TextView zoomLevelTextView;
+
+    private Button rotateActive;
+    private Button zoomActive;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -75,8 +89,28 @@ public class UWBFragment extends Fragment {
 
         mapView = rootView.findViewById(R.id.mapView);
         floorListView = rootView.findViewById(R.id.recyclerFloors);
-        markerManagerWrapper = MarkerManagerWrapper.getInstance(mapView);
 
+        addRotate = rootView.findViewById(R.id.addRotate);
+        minusRotate = rootView.findViewById(R.id.minusRotate);
+        zoomIn = rootView.findViewById(R.id.zoomIn);
+        zoomOut = rootView.findViewById(R.id.zoomOut);
+
+        locationTextView = rootView.findViewById(R.id.locationTextView);
+        rotationTextView = rootView.findViewById(R.id.rotationTextView);
+        zoomLevelTextView = rootView.findViewById(R.id.zoomLevelTextView);
+
+        rotateActive = rootView.findViewById(R.id.rotateActive);
+        zoomActive = rootView.findViewById(R.id.zoomActive);
+
+        addRotate.setOnClickListener(this);
+        minusRotate.setOnClickListener(this);
+        zoomIn.setOnClickListener(this);
+        zoomOut.setOnClickListener(this);
+        rotateActive.setOnClickListener(this);
+        zoomActive.setOnClickListener(this);
+        mapView.setOnMoveListener(this);
+
+        markerManagerWrapper = new MarkerManagerWrapper(mapView);
         return rootView;
     }
 
@@ -121,9 +155,16 @@ public class UWBFragment extends Fragment {
 
         rootView.findViewById(R.id.btnZoomOut)
                 .setOnClickListener(v -> mapView.zoomOut());
-
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        markerManagerWrapper.clearMarkers();
+//        mapView.clearMemory();
+        Log.i("SAHONMU", "onDestroy");
+        System.gc();
+    }
 
     private final MapCallback mapCallback = new MapCallback() {
         @Override
@@ -139,8 +180,11 @@ public class UWBFragment extends Fragment {
 
             mapView.post(() -> {
                 locationSourceUwb = new LocationSourceUwb();
-                mapView.initPosition(locationSourceUwb, locationCallback);
+//                mapView.initPosition(locationSourceUwb, locationCallback);
             });
+
+            rotateActive.setText("rotate = " + mapView.enableRotation());
+            zoomActive.setText("zoom = " + mapView.enableZoom());
         }
 
         @Override
@@ -156,23 +200,20 @@ public class UWBFragment extends Fragment {
 
         @Override
         public void onClick(double x, double y, Poi poi) {
-            if (locationSourceUwb != null) {
-                locationSourceUwb.pushLocationData(x, y, 0.0, currentFloor);
-            }
+//            if (locationSourceUwb != null) {
+//                locationSourceUwb.pushLocationData(x, y, 0.0, currentFloor);
+//            }
         }
 
         @Override
         public void onLongClick(double x, double y, Poi poi) {
-            if (locationSourceUwb != null) {
-                locationSourceUwb.pushLocationData(x, y, 0.0, currentFloor);
-            }
-
-//            fixRotationMap(!mapView.enableRotation());
-//            fixScaleMap(!mapView.enableScale());
-//            drawMarker(x, y);
+//            if (locationSourceUwb != null) {
+//                locationSourceUwb.pushLocationData(x, y, 0.0, currentFloor);
+//            }
+            drawMarker(x, y);
+            mapView.translate(x, y, true);
         }
     };
-
 
     private final LocationCallback locationCallback = new LocationCallback() {
         @Override
@@ -192,7 +233,6 @@ public class UWBFragment extends Fragment {
 
         @Override
         public void onLocation(double x, double y, double angle, int floor) {
-
         }
 
         @Override
@@ -204,26 +244,73 @@ public class UWBFragment extends Fragment {
     private void drawMarker(double x, double y) {
         markerManagerWrapper.clearMarkers();
         int locationDiff = 80;
-
         final View inflateView = markerManagerWrapper.getInflateView(getActivity());
         final View javaCodeView = markerManagerWrapper.getJavaCodeView(getActivity());
         final MarkerTestView customView = markerManagerWrapper.getCustomView(getActivity());
         customView.setResource(R.drawable.icon_start);
         customView.setTitle("TITLE");
 
-        markerManagerWrapper.createMarker(inflateView, x - (locationDiff * 2), y, currentFloor).setRotateAngle(90);
-        markerManagerWrapper.createMarker(javaCodeView, x, y, currentFloor);
-        markerManagerWrapper.createMarker(customView, x + (locationDiff * 2), y, currentFloor).setRotateAngle(270);
-        markerManagerWrapper.createMarker(R.drawable.icon_arrive, x, (y + locationDiff * 2), 50, 50, currentFloor);
-        markerManagerWrapper.createMarker(R.drawable.icon_arrive, x, (y + locationDiff * 2), 50, 50, currentFloor + 1);
+        Marker marker01 = markerManagerWrapper.createMarker(inflateView, x - (locationDiff * 2), y, currentFloor);
+        Marker marker02 = markerManagerWrapper.createMarker(javaCodeView, x, y, currentFloor);
+        Marker marker03 = markerManagerWrapper.createMarker(customView, x + (locationDiff * 2), y, currentFloor);
+
+        marker01.setFixedRotation(false);
+        marker02.setFixedRotation(false);
+        marker03.setFixedRotation(true);
+        marker01.setFixedZoom(false);
+        marker02.setFixedZoom(false);
+        marker03.setFixedZoom(true);
+        marker01.setRotation(0);
+        marker02.setRotation(45);
+        marker03.setRotation(90);
+
+        marker01.getRotation();
+        marker01.getFixedZoom();
+        marker01.getFixedRotation();
+        marker01.setPosition(x, y - 200);
+
         markerManagerWrapper.drawMarkers();
     }
 
-    private void fixRotationMap(boolean enable) {
-        mapView.enableRotation(enable);
+    @Override
+    public void onMove(double x, double y) {
+        locationTextView.setText("coord = " + (int)x + ", " + (int)y);
     }
 
-    private void fixScaleMap(boolean enable) {
-        mapView.enableScale(enable);
+    @Override
+    public void onZoomLevel(double zoomLevel) {
+        zoomLevelTextView.setText("zoomLevel = " + zoomLevel);
     }
+
+    @Override
+    public void onRotation(double rotation) {
+        rotationTextView.setText("angle = " + (int)rotation);
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.addRotate:
+                mapView.rotate(mapView.getAngle() + 10, true);
+                break;
+            case R.id.minusRotate:
+                mapView.rotate(mapView.getAngle() - 10, true);
+                break;
+            case R.id.zoomIn:
+                mapView.zoomLevel(mapView.getZoomLevel() - 0.1, true);
+                break;
+            case R.id.zoomOut:
+                mapView.zoomLevel(mapView.getZoomLevel() + 0.1, true);
+                break;
+            case R.id.rotateActive:
+                mapView.enableRotation(!mapView.enableRotation());
+                rotateActive.setText("rotate = " + mapView.enableRotation());
+                break;
+            case R.id.zoomActive:
+                mapView.enableZoom(!mapView.enableZoom());
+                zoomActive.setText("zoom = " + mapView.enableZoom());
+                break;
+        }
+    }
+
 }
