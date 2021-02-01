@@ -9,19 +9,12 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.DividerItemDecoration;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import com.dabeeo.imsdk.imenum.LocationStatus;
 import com.dabeeo.imsdk.location.LocationCallback;
 import com.dabeeo.imsdk.location.LocationSourceUwb;
 import com.dabeeo.imsdk.map.MapCallback;
 import com.dabeeo.imsdk.map.MapView;
+import com.dabeeo.imsdk.map.interfaces.IMMarkerListener;
 import com.dabeeo.imsdk.map.interfaces.IMMoveListener;
 import com.dabeeo.imsdk.model.common.FloorInfo;
 import com.dabeeo.imsdk.model.gl.Marker;
@@ -37,6 +30,14 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Objects;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 public class UWBFragment extends Fragment implements View.OnClickListener, IMMoveListener {
 
@@ -127,7 +128,8 @@ public class UWBFragment extends Fragment implements View.OnClickListener, IMMov
 
         try {
             StringBuilder sb = new StringBuilder();
-            InputStream is = getResources().getAssets().open("reeum_m1.json");
+//            InputStream is = getResources().getAssets().open("reeum_m1.json");
+            InputStream is = getResources().getAssets().open("mapdata.json");
             BufferedReader br = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
             String str;
             while ((str = br.readLine()) != null) {
@@ -182,6 +184,14 @@ public class UWBFragment extends Fragment implements View.OnClickListener, IMMov
                 locationSourceUwb = new LocationSourceUwb();
 //                mapView.initPosition(locationSourceUwb, locationCallback);
             });
+
+            mapView.setMaxZoom(5.0);
+            mapView.setMinZoom(0.1);
+            mapView.zoomLevel(1.0, false);
+
+            mapView.rotate(45, false);
+            mapView.enableZoom(true);
+            mapView.enableRotation(false);
 
             rotateActive.setText("rotate = " + mapView.enableRotation());
             zoomActive.setText("zoom = " + mapView.enableZoom());
@@ -255,21 +265,24 @@ public class UWBFragment extends Fragment implements View.OnClickListener, IMMov
         Marker marker03 = markerManagerWrapper.createMarker(customView, x + (locationDiff * 2), y, currentFloor);
 
         marker01.setFixedRotation(false);
-        marker02.setFixedRotation(false);
-        marker03.setFixedRotation(true);
+        marker02.setFixedRotation(true);
+        marker03.setFixedRotation(false);
         marker01.setFixedZoom(false);
-        marker02.setFixedZoom(false);
-        marker03.setFixedZoom(true);
-        marker01.setRotation(0);
-        marker02.setRotation(45);
+        marker02.setFixedZoom(true);
+        marker03.setFixedZoom(false);
+        marker01.setRotation(0.0);
+        marker02.setRotation(45.0);
         marker03.setRotation(90);
 
-        marker01.getRotation();
-        marker01.getFixedZoom();
-        marker01.getFixedRotation();
-        marker01.setPosition(x, y - 200);
-
         markerManagerWrapper.drawMarkers();
+
+        mapView.setOnMarkerListener(new IMMarkerListener() {
+            @Override
+            public void setOnMarkerClick(Marker marker) {
+                Log.i(getClass().getSimpleName(), "MARKER INFO / " + marker.toString());
+                markerManagerWrapper.clearMarker(marker, currentFloor);
+            }
+        });
     }
 
     @Override

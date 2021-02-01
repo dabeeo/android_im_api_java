@@ -39,18 +39,10 @@ public class MarkerManagerWrapper {
         this.mapView = mapView;
     }
 
-    /**
-     *
-     * @param resource
-     * @param x
-     * @param y
-     * @param width
-     * @param height
-     * @param floorLevel
-     * @return
-     */
     public Marker createMarker(int resource, double x, double y, double width, double height, int floorLevel) {
-        Marker marker = mapView.addMarker(resource, x, y, width, height, floorLevel);
+        final Marker marker = mapView.addMarker(resource, x, y, width, height, floorLevel);
+        marker.setId("id-" + getMarkers().size());
+        marker.setTag(getMarkers().size() + "번째 마커");
         List<Marker> markers = markerMaps.get(floorLevel);
         if(markers == null) {
             markers = new ArrayList<>();
@@ -60,16 +52,10 @@ public class MarkerManagerWrapper {
         return marker;
     }
 
-    /**
-     *
-     * @param view
-     * @param x
-     * @param y
-     * @param floorLevel
-     * @return
-     */
     public Marker createMarker(View view, double x, double y, int floorLevel) {
-        Marker marker = mapView.addMarker(view, x, y, floorLevel);
+        final Marker marker = mapView.addMarker(view, x, y, floorLevel);
+        marker.setId("id-" + getMarkers().size());
+        marker.setTag(getMarkers().size() + "번째 마커");
         List<Marker> markers = markerMaps.get(floorLevel);
         if(markers == null) {
             markers = new ArrayList<>();
@@ -95,23 +81,34 @@ public class MarkerManagerWrapper {
         while( keys.hasNext() ){
             int key = keys.next();
             if(key == floor) {
-                markers.addAll(markerMaps.get(key));
+                markers = markerMaps.get(key);
             }
         }
+        String st;
         return markers;
+    }
+
+    public void clearMarker(Marker marker, int floor) {
+        ArrayList<Marker> markers = (ArrayList<Marker>) getMarkersByFloor(floor);
+        if(markers != null) {
+            markers.remove(marker);
+            mapView.removeMarker(marker, floor);
+        }
     }
 
     /**
      *
      */
     public void clearMarkers() {
-        Iterator<Integer> keys = markerMaps.keySet().iterator();
-        while( keys.hasNext() ){
-            int key = keys.next();
-            markerMaps.get(key).clear();
+        if(markerMaps != null) {
+            Iterator<Integer> keys = markerMaps.keySet().iterator();
+            while( keys.hasNext() ){
+                int key = keys.next();
+                markerMaps.get(key).clear();
+            }
+            markerMaps.clear();
+            mapView.removeMarker();
         }
-        markerMaps.clear();
-        mapView.removeMarker();
     }
 
     /**
