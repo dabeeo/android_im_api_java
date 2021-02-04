@@ -9,7 +9,9 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.dabeeo.imsdk.common.error.IMError;
 import com.dabeeo.imsdk.imenum.LocationStatus;
+import com.dabeeo.imsdk.imenum.TransType;
 import com.dabeeo.imsdk.location.LocationCallback;
 import com.dabeeo.imsdk.location.LocationSourceUwb;
 import com.dabeeo.imsdk.map.MapCallback;
@@ -19,15 +21,26 @@ import com.dabeeo.imsdk.map.interfaces.IMMoveListener;
 import com.dabeeo.imsdk.model.common.FloorInfo;
 import com.dabeeo.imsdk.model.gl.Marker;
 import com.dabeeo.imsdk.model.map.Poi;
+import com.dabeeo.imsdk.navigation.Location;
+import com.dabeeo.imsdk.navigation.NavigationListener;
+import com.dabeeo.imsdk.navigation.PathRequest;
+import com.dabeeo.imsdk.navigation.PathResult;
+import com.dabeeo.imsdk.navigation.data.NodeData;
+import com.dabeeo.imsdk.navigation.data.Path;
+import com.dabeeo.imsdk.navigation.data.Route;
 import com.dabeeo.imsdk.sample.R;
 import com.dabeeo.imsdk.sample.view.layout.MarkerTestView;
 import com.dabeeo.imsdk.sample.view.main.adapter.FloorListAdapter;
 import com.dabeeo.imsdk.sample.view.main.manager.MarkerManagerWrapper;
 
+import org.jetbrains.annotations.NotNull;
+import org.rajawali3d.math.vector.Vector3;
+
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -44,7 +57,7 @@ public class UWBFragment extends Fragment implements View.OnClickListener, IMMov
     public static final String TAG = UWBFragment.class.getSimpleName();
 
     private View rootView;
-    private Marker marker;
+    private boolean isNavigating = false;
 
     public UWBFragment() {
         // Required empty public constructor
@@ -60,9 +73,9 @@ public class UWBFragment extends Fragment implements View.OnClickListener, IMMov
     private List<FloorInfo> floorInfoList;
 
     private LocationSourceUwb locationSourceUwb;
-    private double x = 100.0;
 
     private MarkerManagerWrapper markerManagerWrapper;
+    private ArrayList<NodeData> nodeDatas = new ArrayList<>();
 
     private Button addRotate;
     private Button minusRotate;
@@ -129,7 +142,7 @@ public class UWBFragment extends Fragment implements View.OnClickListener, IMMov
         try {
             StringBuilder sb = new StringBuilder();
 //            InputStream is = getResources().getAssets().open("reeum_m1.json");
-            InputStream is = getResources().getAssets().open("mapdata.json");
+            InputStream is = getResources().getAssets().open("mapdata_test.json");
             BufferedReader br = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
             String str;
             while ((str = br.readLine()) != null) {
@@ -163,8 +176,6 @@ public class UWBFragment extends Fragment implements View.OnClickListener, IMMov
     public void onDestroy() {
         super.onDestroy();
         markerManagerWrapper.clearMarkers();
-//        mapView.clearMemory();
-        Log.i("SAHONMU", "onDestroy");
         System.gc();
     }
 
@@ -182,16 +193,15 @@ public class UWBFragment extends Fragment implements View.OnClickListener, IMMov
 
             mapView.post(() -> {
                 locationSourceUwb = new LocationSourceUwb();
-//                mapView.initPosition(locationSourceUwb, locationCallback);
+                mapView.initPosition(locationSourceUwb, locationCallback);
             });
 
             mapView.setMaxZoom(5.0);
             mapView.setMinZoom(0.1);
             mapView.zoomLevel(1.0, false);
-
-            mapView.rotate(45, false);
-            mapView.enableZoom(true);
-            mapView.enableRotation(false);
+//            mapView.rotate(45, false);
+//            mapView.enableZoom(true);
+//            mapView.enableRotation(false);
 
             rotateActive.setText("rotate = " + mapView.enableRotation());
             zoomActive.setText("zoom = " + mapView.enableZoom());
@@ -220,8 +230,22 @@ public class UWBFragment extends Fragment implements View.OnClickListener, IMMov
 //            if (locationSourceUwb != null) {
 //                locationSourceUwb.pushLocationData(x, y, 0.0, currentFloor);
 //            }
-            drawMarker(x, y);
+//            drawMarker(x, y);
             mapView.translate(x, y, true);
+
+            if(!isNavigating) {
+                Vector3 originVector = new Vector3(x, y, 0);
+                Vector3 destinationVector = new Vector3(570, 358, 0);
+                Location originLocation = new Location(originVector, currentFloor, "");
+                Location destinationLocation = new Location(destinationVector, currentFloor, "");
+                List<Location> wayPoints = new ArrayList<>();
+                PathRequest pathRequest = new PathRequest(originLocation, destinationLocation, wayPoints, TransType.ALL);
+                mapView.findPath(pathRequest, mNavigationListener);
+                mapView.startNavigation();
+            } else {
+                locationSourceUwb.pushLocationData(x, y,0, mapView.getFloorLevel());
+            }
+
         }
     };
 
@@ -252,7 +276,7 @@ public class UWBFragment extends Fragment implements View.OnClickListener, IMMov
     };
 
     private void drawMarker(double x, double y) {
-        markerManagerWrapper.clearMarkers();
+//        markerManagerWrapper.clearMarkers();
         int locationDiff = 80;
         final View inflateView = markerManagerWrapper.getInflateView(getActivity());
         final View javaCodeView = markerManagerWrapper.getJavaCodeView(getActivity());
@@ -278,11 +302,20 @@ public class UWBFragment extends Fragment implements View.OnClickListener, IMMov
 
         mapView.setOnMarkerListener(new IMMarkerListener() {
             @Override
+            public void setOnMarkerLongClick(Marker marker) {
+
+            }
+
+            @Override
             public void setOnMarkerClick(Marker marker) {
                 Log.i(getClass().getSimpleName(), "MARKER INFO / " + marker.toString());
                 markerManagerWrapper.clearMarker(marker, currentFloor);
             }
         });
+    }
+
+    private void showToast(String message) {
+        Toast.makeText(getActivity(), message, Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -299,6 +332,57 @@ public class UWBFragment extends Fragment implements View.OnClickListener, IMMov
     public void onRotation(double rotation) {
         rotationTextView.setText("angle = " + (int)rotation);
     }
+
+    public NavigationListener mNavigationListener = new NavigationListener() {
+        @Override
+        public void onPathResult(PathResult pathResult) {
+            markerManagerWrapper.clearMarkers();
+            if(pathResult.isSuccess()) {
+                nodeDatas = pathResult.getPathData().getCurrentRoute().getCurrentPath().getNodeDatas();
+                for (int i = 0; i < nodeDatas.size(); i++) {
+                    NodeData nodeData = nodeDatas.get(i);
+                    final View inflateView = markerManagerWrapper.getJavaCodeView(getActivity());
+                    markerManagerWrapper.createMarker(inflateView, nodeData.getPosition().x, nodeData.getPosition().y, currentFloor);
+                }
+            }
+            markerManagerWrapper.drawMarkers();
+        }
+
+        @Override
+        public void onStart() {
+            showToast("onStart");
+            isNavigating = true;
+        }
+
+        @Override
+        public void onFinish() {
+            showToast("onFinish");
+            isNavigating = false;
+            markerManagerWrapper.clearMarkers();
+        }
+
+        @Override
+        public void onCancel() {
+            showToast("onCancel");
+            isNavigating = false;
+            markerManagerWrapper.clearMarkers();
+        }
+
+        @Override
+        public void onUpdate(Route route, Path path, NodeData nodeData, Vector3 vector3) {
+
+        }
+
+        @Override
+        public void onRescan() {
+
+        }
+
+        @Override
+        public void onError(IMError imError) {
+
+        }
+    };
 
     @Override
     public void onClick(View v) {

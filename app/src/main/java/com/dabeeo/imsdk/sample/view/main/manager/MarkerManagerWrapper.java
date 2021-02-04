@@ -120,8 +120,8 @@ public class MarkerManagerWrapper {
 
     public final View getJavaCodeView(Context context) {
         RelativeLayout relativeLayout = new RelativeLayout(context);
-        relativeLayout.setBackgroundColor(Color.YELLOW);
-        relativeLayout.setLayoutParams(new ViewGroup.LayoutParams(50, 50));
+        relativeLayout.setBackgroundColor(Color.BLUE);
+        relativeLayout.setLayoutParams(new ViewGroup.LayoutParams(25, 25));
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
         params.addRule(RelativeLayout.CENTER_IN_PARENT);
         TextView textView = new TextView(context);
@@ -129,7 +129,7 @@ public class MarkerManagerWrapper {
         textView.setTextColor(Color.BLACK);
         textView.setLayoutParams(params);
         textView.setTextSize(10);
-        relativeLayout.addView(textView);
+//        relativeLayout.addView(textView);
         return relativeLayout;
     }
 
