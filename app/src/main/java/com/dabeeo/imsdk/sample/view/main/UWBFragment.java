@@ -58,6 +58,7 @@ public class UWBFragment extends Fragment implements View.OnClickListener, IMMov
 
     private View rootView;
     private boolean isNavigating = false;
+    private Marker mMarker = null;
 
     public UWBFragment() {
         // Required empty public constructor
@@ -138,11 +139,10 @@ public class UWBFragment extends Fragment implements View.OnClickListener, IMMov
         divider.setDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.shape_divider));
         floorListView.addItemDecoration(divider);
 
-
         try {
             StringBuilder sb = new StringBuilder();
-//            InputStream is = getResources().getAssets().open("reeum_m1.json");
-            InputStream is = getResources().getAssets().open("mapdata_test.json");
+            InputStream is = getResources().getAssets().open("mapdata.json");
+//            InputStream is = getResources().getAssets().open("mapdata_error.json");
             BufferedReader br = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
             String str;
             while ((str = br.readLine()) != null) {
@@ -160,7 +160,7 @@ public class UWBFragment extends Fragment implements View.OnClickListener, IMMov
             /*String filePath = "/mnt/sdcard/dabeeomaps/";
             mapView.syncMapByLocal(filePath, mapCallback);
 
-            locationSourceUwb = new LocationSourceUwb();
+            locationSourceUwb = new LocationSourceUwb();네
             mapView.initPosition(locationSourceUwb, locationCallback);*/
 
 
@@ -176,6 +176,7 @@ public class UWBFragment extends Fragment implements View.OnClickListener, IMMov
     public void onDestroy() {
         super.onDestroy();
         markerManagerWrapper.clearMarkers();
+        mapView.destroy();
         System.gc();
     }
 
@@ -190,21 +191,16 @@ public class UWBFragment extends Fragment implements View.OnClickListener, IMMov
             adapter.notifyDataSetChanged();
             floorInfoList = list;
 
-
             mapView.post(() -> {
                 locationSourceUwb = new LocationSourceUwb();
-                mapView.initPosition(locationSourceUwb, locationCallback);
+                mapView.initPosition(locationSourceUwb, null);
             });
-
-            mapView.setMaxZoom(5.0);
-            mapView.setMinZoom(0.1);
-            mapView.zoomLevel(1.0, false);
-//            mapView.rotate(45, false);
-//            mapView.enableZoom(true);
-//            mapView.enableRotation(false);
 
             rotateActive.setText("rotate = " + mapView.enableRotation());
             zoomActive.setText("zoom = " + mapView.enableZoom());
+            mapView.setMaxZoom(5.0);
+            mapView.setMinZoom(0.5);
+            mapView.zoomLevel(1.5, false);
         }
 
         @Override
@@ -220,22 +216,14 @@ public class UWBFragment extends Fragment implements View.OnClickListener, IMMov
 
         @Override
         public void onClick(double x, double y, Poi poi) {
-//            if (locationSourceUwb != null) {
-//                locationSourceUwb.pushLocationData(x, y, 0.0, currentFloor);
-//            }
+
         }
 
         @Override
         public void onLongClick(double x, double y, Poi poi) {
-//            if (locationSourceUwb != null) {
-//                locationSourceUwb.pushLocationData(x, y, 0.0, currentFloor);
-//            }
-//            drawMarker(x, y);
-            mapView.translate(x, y, true);
-
             if(!isNavigating) {
                 Vector3 originVector = new Vector3(x, y, 0);
-                Vector3 destinationVector = new Vector3(570, 358, 0);
+                Vector3 destinationVector = new Vector3(1527, 1506, 0);
                 Location originLocation = new Location(originVector, currentFloor, "");
                 Location destinationLocation = new Location(destinationVector, currentFloor, "");
                 List<Location> wayPoints = new ArrayList<>();
@@ -245,33 +233,7 @@ public class UWBFragment extends Fragment implements View.OnClickListener, IMMov
             } else {
                 locationSourceUwb.pushLocationData(x, y,0, mapView.getFloorLevel());
             }
-
-        }
-    };
-
-    private final LocationCallback locationCallback = new LocationCallback() {
-        @Override
-        public void onError(Exception e) {
-
-        }
-
-        @Override
-        public void onChangeFloor(int floor) {
-
-        }
-
-        @Override
-        public void initLocation(double x, double y, double angle, int floor) {
-
-        }
-
-        @Override
-        public void onLocation(double x, double y, double angle, int floor) {
-        }
-
-        @Override
-        public void onLocationStatus(LocationStatus locationStatus) {
-
+//            boolean passable = mapView.isPassableArea(x, y, mapView.getFloorLevel());
         }
     };
 
@@ -302,12 +264,12 @@ public class UWBFragment extends Fragment implements View.OnClickListener, IMMov
 
         mapView.setOnMarkerListener(new IMMarkerListener() {
             @Override
-            public void setOnMarkerLongClick(Marker marker) {
+            public void onMarkerLongClick(Marker marker) {
 
             }
 
             @Override
-            public void setOnMarkerClick(Marker marker) {
+            public void onMarkerClick(Marker marker) {
                 Log.i(getClass().getSimpleName(), "MARKER INFO / " + marker.toString());
                 markerManagerWrapper.clearMarker(marker, currentFloor);
             }
@@ -370,16 +332,43 @@ public class UWBFragment extends Fragment implements View.OnClickListener, IMMov
 
         @Override
         public void onUpdate(Route route, Path path, NodeData nodeData, Vector3 vector3) {
-
+            mapView.translate(vector3.x, vector3.y, true);
+            Log.i(TAG, "remainingDistance = " + path.getRemainingDistance());
         }
 
         @Override
         public void onRescan() {
-
+            showToast("onRescan");
         }
 
         @Override
         public void onError(IMError imError) {
+
+        }
+    };
+
+    private final LocationCallback locationCallback = new LocationCallback() {
+        @Override
+        public void onError(Exception e) {
+
+        }
+
+        @Override
+        public void onChangeFloor(int floor) {
+
+        }
+
+        @Override
+        public void initLocation(double x, double y, double angle, int floor) {
+
+        }
+
+        @Override
+        public void onLocation(double x, double y, double angle, int floor) {
+        }
+
+        @Override
+        public void onLocationStatus(LocationStatus locationStatus) {
 
         }
     };
