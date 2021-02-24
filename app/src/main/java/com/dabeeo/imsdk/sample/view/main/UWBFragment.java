@@ -170,6 +170,19 @@ public class UWBFragment extends Fragment implements View.OnClickListener, IMMov
 
         rootView.findViewById(R.id.btnZoomOut)
                 .setOnClickListener(v -> mapView.zoomOut());
+
+        mapView.setOnMarkerListener(new IMMarkerListener() {
+            @Override
+            public void onMarkerLongClick(Marker marker) {
+
+            }
+
+            @Override
+            public void onMarkerClick(Marker marker) {
+                mapView.removeMarker(marker);
+                mMarker = null;
+            }
+        });
     }
 
     @Override
@@ -201,6 +214,8 @@ public class UWBFragment extends Fragment implements View.OnClickListener, IMMov
             mapView.setMaxZoom(5.0);
             mapView.setMinZoom(0.5);
             mapView.zoomLevel(1.5, false);
+
+            markerManagerWrapper.parseReadData(getActivity(), "reeumRealData.json");
         }
 
         @Override
@@ -221,18 +236,24 @@ public class UWBFragment extends Fragment implements View.OnClickListener, IMMov
 
         @Override
         public void onLongClick(double x, double y, Poi poi) {
-            if(!isNavigating) {
-                Vector3 originVector = new Vector3(x, y, 0);
-                Vector3 destinationVector = new Vector3(1527, 1506, 0);
-                Location originLocation = new Location(originVector, currentFloor, "");
-                Location destinationLocation = new Location(destinationVector, currentFloor, "");
-                List<Location> wayPoints = new ArrayList<>();
-                PathRequest pathRequest = new PathRequest(originLocation, destinationLocation, wayPoints, TransType.ALL);
-                mapView.findPath(pathRequest, mNavigationListener);
-                mapView.startNavigation();
-            } else {
-                locationSourceUwb.pushLocationData(x, y,0, mapView.getFloorLevel());
+            if(mMarker == null) {
+                mMarker = markerManagerWrapper.createMarker(R.drawable.icon_mylocation, x, y, 100, 100, mapView.getFloorLevel());
+                mMarker.setFixedZoom(true);
+                markerManagerWrapper.drawMarkers();
             }
+
+//            if(!isNavigating) {
+//                Vector3 originVector = new Vector3(x, y, 0);
+//                Vector3 destinationVector = new Vector3(1527, 1506, 0);
+//                Location originLocation = new Location(originVector, currentFloor, "");
+//                Location destinationLocation = new Location(destinationVector, currentFloor, "");
+//                List<Location> wayPoints = new ArrayList<>();
+//                PathRequest pathRequest = new PathRequest(originLocation, destinationLocation, wayPoints, TransType.ALL);
+//                mapView.findPath(pathRequest, mNavigationListener);
+//                mapView.startNavigation();
+//            } else {
+//                locationSourceUwb.pushLocationData(x, y,0, mapView.getFloorLevel());
+//            }
 //            boolean passable = mapView.isPassableArea(x, y, mapView.getFloorLevel());
         }
     };
@@ -270,8 +291,10 @@ public class UWBFragment extends Fragment implements View.OnClickListener, IMMov
 
             @Override
             public void onMarkerClick(Marker marker) {
-                Log.i(getClass().getSimpleName(), "MARKER INFO / " + marker.toString());
-                markerManagerWrapper.clearMarker(marker, currentFloor);
+//                Log.i(getClass().getSimpleName(), "MARKER INFO / " + marker.toString());
+//                markerManagerWrapper.clearMarker(marker, currentFloor);
+                mapView.removeMarker(marker);
+                mMarker = null;
             }
         });
     }

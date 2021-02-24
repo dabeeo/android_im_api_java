@@ -14,6 +14,10 @@ import com.dabeeo.imsdk.model.gl.Marker;
 import com.dabeeo.imsdk.sample.R;
 import com.dabeeo.imsdk.sample.view.layout.MarkerTestView;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -92,7 +96,7 @@ public class MarkerManagerWrapper {
         ArrayList<Marker> markers = (ArrayList<Marker>) getMarkersByFloor(floor);
         if(markers != null) {
             markers.remove(marker);
-            mapView.removeMarker(marker, floor);
+            mapView.removeMarker(marker);
         }
     }
 
@@ -142,6 +146,24 @@ public class MarkerManagerWrapper {
     public final MarkerTestView getCustomView(Context context) {
         return new MarkerTestView(context);
     }
+
+    public void parseReadData(Context context, String fileName) {
+        try {
+            StringBuilder sb = new StringBuilder();
+            InputStream is = context.getResources().getAssets().open(fileName);
+            BufferedReader br = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
+            String str;
+            while ((str = br.readLine()) != null) {
+                sb.append(str);
+            }
+            br.close();
+            mapView.drawRealData(sb.toString());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
 
 
 }

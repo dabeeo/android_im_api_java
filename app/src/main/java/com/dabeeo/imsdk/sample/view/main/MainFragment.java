@@ -135,7 +135,6 @@ public class MainFragment extends Fragment {
             public void onSelectStart(LocationInfo locationInfo) {
                 mapView.removeMarker();
                 startLocation = locationInfo;
-                mapView.drawStartMarker(locationInfo.getLocation().getOriginPosition().x, locationInfo.getLocation().getOriginPosition().y, locationInfo.getLocation().getFloorLevel());
 
                 layoutLocationSetting.bind(startLocation, endLocation);
                 tryPathRequest(TransType.ALL);
@@ -145,7 +144,6 @@ public class MainFragment extends Fragment {
             public void onSelectEnd(LocationInfo locationInfo) {
                 mapView.removeMarker();
                 endLocation = locationInfo;
-                mapView.drawEndMarker(locationInfo.getLocation().getOriginPosition().x, locationInfo.getLocation().getOriginPosition().y, locationInfo.getLocation().getFloorLevel());
 
                 layoutLocationSetting.bind(startLocation, endLocation);
                 tryPathRequest(TransType.ALL);
@@ -183,7 +181,6 @@ public class MainFragment extends Fragment {
         layoutNavigationInfo.setListener(new NavigationInfoView.NavigationInfoListener() {
             @Override
             public void onStartPreview() {
-                mapView.startNavigationPreview();
             }
 
             @Override
