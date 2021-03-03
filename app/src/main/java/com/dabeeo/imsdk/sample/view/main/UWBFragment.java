@@ -11,7 +11,6 @@ import android.widget.Toast;
 
 import com.dabeeo.imsdk.common.error.IMError;
 import com.dabeeo.imsdk.imenum.LocationStatus;
-import com.dabeeo.imsdk.imenum.TransType;
 import com.dabeeo.imsdk.location.LocationCallback;
 import com.dabeeo.imsdk.location.LocationSourceUwb;
 import com.dabeeo.imsdk.map.MapCallback;
@@ -21,9 +20,7 @@ import com.dabeeo.imsdk.map.interfaces.IMMoveListener;
 import com.dabeeo.imsdk.model.common.FloorInfo;
 import com.dabeeo.imsdk.model.gl.Marker;
 import com.dabeeo.imsdk.model.map.Poi;
-import com.dabeeo.imsdk.navigation.Location;
 import com.dabeeo.imsdk.navigation.NavigationListener;
-import com.dabeeo.imsdk.navigation.PathRequest;
 import com.dabeeo.imsdk.navigation.PathResult;
 import com.dabeeo.imsdk.navigation.data.NodeData;
 import com.dabeeo.imsdk.navigation.data.Path;
@@ -32,8 +29,8 @@ import com.dabeeo.imsdk.sample.R;
 import com.dabeeo.imsdk.sample.view.layout.MarkerTestView;
 import com.dabeeo.imsdk.sample.view.main.adapter.FloorListAdapter;
 import com.dabeeo.imsdk.sample.view.main.manager.MarkerManagerWrapper;
+import com.dabeeo.imsdk.sample.view.main.manager.NavigationManagerWrapper;
 
-import org.jetbrains.annotations.NotNull;
 import org.rajawali3d.math.vector.Vector3;
 
 import java.io.BufferedReader;
@@ -76,7 +73,7 @@ public class UWBFragment extends Fragment implements View.OnClickListener, IMMov
     private LocationSourceUwb locationSourceUwb;
 
     private MarkerManagerWrapper markerManagerWrapper;
-    private ArrayList<NodeData> nodeDatas = new ArrayList<>();
+    private NavigationManagerWrapper navigationManagerWrapper;
 
     private Button addRotate;
     private Button minusRotate;
@@ -126,6 +123,7 @@ public class UWBFragment extends Fragment implements View.OnClickListener, IMMov
         mapView.setOnMoveListener(this);
 
         markerManagerWrapper = new MarkerManagerWrapper(mapView);
+        navigationManagerWrapper = NavigationManagerWrapper.getInstance(mapView);
         return rootView;
     }
 
@@ -189,6 +187,7 @@ public class UWBFragment extends Fragment implements View.OnClickListener, IMMov
     public void onDestroy() {
         super.onDestroy();
         markerManagerWrapper.clearMarkers();
+        navigationManagerWrapper.stopNavigation();
         mapView.destroy();
         System.gc();
     }
@@ -236,25 +235,20 @@ public class UWBFragment extends Fragment implements View.OnClickListener, IMMov
 
         @Override
         public void onLongClick(double x, double y, Poi poi) {
-            if(mMarker == null) {
-                mMarker = markerManagerWrapper.createMarker(R.drawable.icon_mylocation, x, y, 100, 100, mapView.getFloorLevel());
-                mMarker.setFixedZoom(true);
-                markerManagerWrapper.drawMarkers();
-            }
-
-//            if(!isNavigating) {
-//                Vector3 originVector = new Vector3(x, y, 0);
-//                Vector3 destinationVector = new Vector3(1527, 1506, 0);
-//                Location originLocation = new Location(originVector, currentFloor, "");
-//                Location destinationLocation = new Location(destinationVector, currentFloor, "");
-//                List<Location> wayPoints = new ArrayList<>();
-//                PathRequest pathRequest = new PathRequest(originLocation, destinationLocation, wayPoints, TransType.ALL);
-//                mapView.findPath(pathRequest, mNavigationListener);
-//                mapView.startNavigation();
+//            if(mMarker == null) {
+//                mMarker = markerManagerWrapper.createMarker(R.drawable.icon_mylocation, x, y, 100, 100, mapView.getFloorLevel());
+//                mMarker.setFixedZoom(true);
+//                markerManagerWrapper.drawMarkers();
 //            } else {
-//                locationSourceUwb.pushLocationData(x, y,0, mapView.getFloorLevel());
+//                mapView.updateMarker(mMarker, mMarker.getFloorLevel() + 1);
 //            }
-//            boolean passable = mapView.isPassableArea(x, y, mapView.getFloorLevel());
+
+            if(!navigationManagerWrapper.isNavigating()) {
+                navigationManagerWrapper.showNavigationDialog(getActivity(), x, y, mapView.getFloorLevel());
+            } else {
+                mapView.translate(x, y, true);
+                locationSourceUwb.pushLocationData(x, y,0, mapView.getFloorLevel());
+            }
         }
     };
 
@@ -317,58 +311,6 @@ public class UWBFragment extends Fragment implements View.OnClickListener, IMMov
     public void onRotation(double rotation) {
         rotationTextView.setText("angle = " + (int)rotation);
     }
-
-    public NavigationListener mNavigationListener = new NavigationListener() {
-        @Override
-        public void onPathResult(PathResult pathResult) {
-            markerManagerWrapper.clearMarkers();
-            if(pathResult.isSuccess()) {
-                nodeDatas = pathResult.getPathData().getCurrentRoute().getCurrentPath().getNodeDatas();
-                for (int i = 0; i < nodeDatas.size(); i++) {
-                    NodeData nodeData = nodeDatas.get(i);
-                    final View inflateView = markerManagerWrapper.getJavaCodeView(getActivity());
-                    markerManagerWrapper.createMarker(inflateView, nodeData.getPosition().x, nodeData.getPosition().y, currentFloor);
-                }
-            }
-            markerManagerWrapper.drawMarkers();
-        }
-
-        @Override
-        public void onStart() {
-            showToast("onStart");
-            isNavigating = true;
-        }
-
-        @Override
-        public void onFinish() {
-            showToast("onFinish");
-            isNavigating = false;
-            markerManagerWrapper.clearMarkers();
-        }
-
-        @Override
-        public void onCancel() {
-            showToast("onCancel");
-            isNavigating = false;
-            markerManagerWrapper.clearMarkers();
-        }
-
-        @Override
-        public void onUpdate(Route route, Path path, NodeData nodeData, Vector3 vector3) {
-            mapView.translate(vector3.x, vector3.y, true);
-            Log.i(TAG, "remainingDistance = " + path.getRemainingDistance());
-        }
-
-        @Override
-        public void onRescan() {
-            showToast("onRescan");
-        }
-
-        @Override
-        public void onError(IMError imError) {
-
-        }
-    };
 
     private final LocationCallback locationCallback = new LocationCallback() {
         @Override
